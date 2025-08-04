@@ -1,6 +1,7 @@
+import os
 from motor.motor_asyncio import AsyncIOMotorClient
 
-MONGO_URL = "mongodb+srv://joe:1kotWWXWu0aFznUc@cluster0.agajrkh.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0"  # or your MongoDB Atlas URI
+MONGO_URL = os.getenv("MONGO_URI")  # Reads from environment variable
 
 client = AsyncIOMotorClient(MONGO_URL)
 db = client["product_db"]

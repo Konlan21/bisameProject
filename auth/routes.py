@@ -9,14 +9,14 @@ from jose import JWTError, jwt
 from auth.jwt_handler import create_access_token
 from db.fake_db import users_db
 from auth.jwt_handler import SECRET_KEY, ALGORITHM
-from main import limiter
+from rate_limiter import limiter
 from auth.models import RefreshTokenRequest
 
 router = APIRouter() 
 
 @router.post("/login")
 @limiter.limit("5/minute")
-def login(form_data: OAuth2PasswordRequestForm = Depends()):
+def login(request: Request, form_data: OAuth2PasswordRequestForm = Depends()):
     user = users_db.get(form_data.username)
     if not user or user.password != form_data.password:
         raise HTTPException(status_code=401, detail="Invalid credentials")
@@ -39,7 +39,7 @@ def login(form_data: OAuth2PasswordRequestForm = Depends()):
 
 @router.post("/refresh")
 @limiter.limit("10/minute")
-def refresh_token(data: RefreshTokenRequest):
+def refresh_token(request: Request, data: RefreshTokenRequest):
     try:
         refresh_token = data.refresh_token
 

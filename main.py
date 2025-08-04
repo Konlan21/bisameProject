@@ -2,9 +2,9 @@ from fastapi import FastAPI
 from auth.routes import router as auth_router 
 from db.mongo import db 
 from products.routes import router as product_router
-from slowapi import Limiter, _rate_limit_exceeded_handler
-from slowapi.util import get_remote_address
+from rate_limiter import limiter
 from slowapi.errors import RateLimitExceeded
+from slowapi import _rate_limit_exceeded_handler
 
 
 
@@ -27,10 +27,11 @@ async def ping_mongo():
 
 
 
-limiter = Limiter(key_func=get_remote_address)
 
 app.state.limiter = limiter
 app.add_exception_handler(RateLimitExceeded, _rate_limit_exceeded_handler)
 
 
+app.state.limiter = limiter
+app.add_exception_handler(RateLimitExceeded, _rate_limit_exceeded_handler)
 

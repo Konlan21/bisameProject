@@ -1,4 +1,4 @@
-from fastapi import APIRouter, Depends, HTTPException, Response
+from fastapi import APIRouter, Depends, HTTPException, Response, Request
 # from auth.dependencies import get_current_user
 from auth.models import User
 from roles.permissions import require_role
@@ -10,7 +10,7 @@ from db.mongo import product_collection
 from products.schemas import ProductDBModel, ProductCreateModel, ProductUpdateModel
 from bson import ObjectId
 from typing import List, Optional
-from main import limiter
+from rate_limiter import limiter
 
 
 router = APIRouter()
@@ -18,7 +18,7 @@ router = APIRouter()
 
 @router.post("/", response_model=ProductDBModel)
 @limiter.limit("3/minute") 
-async def create_product(product: ProductCreateModel, user: User = Depends(require_role("vendor"))):
+async def create_product(request: Request, product: ProductCreateModel, user: User = Depends(require_role("vendor"))):
     product_dict = product.model_dump()
     product_dict["vendor"] = user.username
     result = await product_collection.insert_one(product_dict)
@@ -55,6 +55,7 @@ async def update_product(
 @router.delete("/{id}", status_code=204)
 @limiter.limit("3/minute")
 async def delete_product(
+    request: Request,
     id: str,
     user: User = Depends(require_role("vendor"))
 ):
@@ -72,6 +73,7 @@ async def delete_product(
 @router.get("/search", response_model=List[ProductDBModel])
 @limiter.limit("10/minute")
 async def search_products(
+    request: Request,
     name: Optional[str] = Query(None),
     vendor: Optional[str] = Query(None),
     q: Optional[str] = Query(None),

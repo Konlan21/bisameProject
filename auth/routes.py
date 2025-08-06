@@ -15,7 +15,7 @@ from auth.models import RefreshTokenRequest
 router = APIRouter() 
 
 @router.post("/login")
-@limiter.limit("5/minute")
+@limiter.limit("6/minute")
 def login(request: Request, form_data: OAuth2PasswordRequestForm = Depends()):
     user = users_db.get(form_data.username)
     if not user or user.password != form_data.password:

@@ -26,13 +26,31 @@ async def create_product(request: Request, product: ProductCreateModel, user: Us
     saved["_id"] = str(saved["_id"])
     return saved
 
+
 @router.get("/mine")
-async def list_my_products(user: User = Depends(require_role("vendor"))):
-    return await get_products_by_vendor(user.username)
+async def list_my_products(
+    user: User = Depends(require_role("vendor")),
+    skip: int = Query(0, ge=0),
+    limit: int = Query(10, ge=1, le=100),
+):
+    total = await product_collection.count_documents({"vendor": user.username})
+    cursor = product_collection.find({"vendor": user.username}).skip(skip).limit(limit)
+    products = []
+    async for product in cursor:
+        product["_id"] = str(product["_id"])  # Convert ObjectId to string
+        products.append(product)
+
+    return {
+        "total": total,
+        "skip": skip,
+        "limit": limit,
+        "products": products
+    }
+
+
 
 
 @router.put("/{id}", response_model=ProductDBModel)
-@router.put("/{product_id}")
 async def update_product(
     id: str,
     product_data: ProductUpdateModel,

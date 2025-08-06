@@ -5,7 +5,7 @@ from products.routes import router as product_router
 from rate_limiter import limiter
 from slowapi.errors import RateLimitExceeded
 from slowapi import _rate_limit_exceeded_handler
-
+from affiliate.routes import router as affiliate_router
 
 
 app = FastAPI()
@@ -13,6 +13,7 @@ app = FastAPI()
 
 app.include_router(auth_router, prefix='/auth', tags=["Auth"])
 app.include_router(product_router, prefix="/products", tags=["Products"])
+app.include_router(affiliate_router, prefix="/affiliate", tags=["Affiliate"])
 
 
 # Test mongodb connection
@@ -25,11 +26,6 @@ async def ping_mongo():
     except Exception as e:
         return {"status": "error", "message": str(e)}
 
-
-
-
-app.state.limiter = limiter
-app.add_exception_handler(RateLimitExceeded, _rate_limit_exceeded_handler)
 
 
 app.state.limiter = limiter

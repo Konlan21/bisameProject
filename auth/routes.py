@@ -8,7 +8,7 @@ from fastapi import Request, HTTPException
 from jose import JWTError, jwt
 from auth.jwt_handler import create_access_token
 from db.fake_db import users_db
-from auth.jwt_handler import SECRET_KEY, ALGORITHM
+from auth.jwt_handler import SECRET_KEY, ALGORITHM 
 from rate_limiter import limiter
 from auth.models import RefreshTokenRequest
 

@@ -1,4 +1,6 @@
 from fastapi import FastAPI
+from dotenv import load_dotenv
+load_dotenv()
 from auth.routes import router as auth_router 
 from db.mongo import db 
 from products.routes import router as product_router
@@ -6,6 +8,10 @@ from rate_limiter import limiter
 from slowapi.errors import RateLimitExceeded
 from slowapi import _rate_limit_exceeded_handler
 from affiliate.routes import router as affiliate_router
+
+
+
+
 
 
 app = FastAPI()
